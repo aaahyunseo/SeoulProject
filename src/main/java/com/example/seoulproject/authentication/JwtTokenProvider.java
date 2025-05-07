@@ -18,8 +18,8 @@ public class JwtTokenProvider {
     private final SecretKey key; // 시크릿 키
     private final long validityInMilliseconds; // 유효 시간
 
-    public JwtTokenProvider(@Value("${security.jwt.token.secret-key}") final String secretKey,
-                            @Value("${security.jwt.token.expire-length}") final long validityInMilliseconds) {
+    public JwtTokenProvider(@Value("${security.jwt.token.secret-access-key}") final String secretKey,
+                            @Value("${security.jwt.token.access-expire-length}") final long validityInMilliseconds) {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.validityInMilliseconds = validityInMilliseconds;
     }
