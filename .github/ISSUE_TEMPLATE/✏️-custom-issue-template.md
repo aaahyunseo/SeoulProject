@@ -7,13 +7,13 @@ assignees: ''
 
 ---
 
-🚀 Description
+## **🚀 Description**
 
 
-🛠️ TO-DO
+## **🛠️ TO-DO**
 - [ ] 
 - [ ] 
 
-📌 Additional Context
+## **📌 Additional Context**
 - [ ] 
 - [ ]
