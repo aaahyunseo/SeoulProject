@@ -13,14 +13,14 @@ public class BoardResponseDto {
     private UUID boardId;
     private String title;
     private String content;
-    private String createAt;
+    private String createdAt;
 
     public static BoardResponseDto from(Board board) {
         return BoardResponseDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
-                .createAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .createdAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .build();
     }
 }
