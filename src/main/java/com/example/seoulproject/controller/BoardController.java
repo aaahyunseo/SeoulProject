@@ -1,0 +1,61 @@
+package com.example.seoulproject.controller;
+
+import com.example.seoulproject.authentication.AuthenticatedUser;
+import com.example.seoulproject.dto.request.board.CreateBoardDto;
+import com.example.seoulproject.dto.request.board.UpdateBoardDto;
+import com.example.seoulproject.dto.response.ResponseDto;
+import com.example.seoulproject.dto.response.board.BoardData;
+import com.example.seoulproject.dto.response.board.BoardListData;
+import com.example.seoulproject.entity.User;
+import com.example.seoulproject.service.BoardService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/boards")
+public class BoardController {
+    private final BoardService boardService;
+
+    // 게시글 전체 조회
+    @GetMapping
+    public ResponseEntity<ResponseDto<BoardListData>> getBoardList() {
+        BoardListData boardListData = boardService.getBoardList();
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 전체 조회 완료", boardListData), HttpStatus.OK);
+    }
+
+    // 게시글 상세 조회
+    @GetMapping("/{boardId}")
+    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        BoardData boardDto = boardService.getBoardById(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 상세 조회 완료", boardDto), HttpStatus.OK);
+    }
+
+    // 게시글 작성
+    @PostMapping
+    public ResponseEntity<ResponseDto<Void>> createBoard(@AuthenticatedUser User user, @Valid @RequestBody CreateBoardDto createBoardDto) {
+        boardService.createBoard(user, createBoardDto);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "게시글 작성 완료"), HttpStatus.CREATED);
+    }
+
+    // 게시글 수정
+    @PatchMapping("/{boardId}")
+    public ResponseEntity<ResponseDto<Void>> updateBoard(@AuthenticatedUser User user,
+                                                         @PathVariable UUID boardId,
+                                                         @Valid @RequestBody UpdateBoardDto updateBoardDto) {
+        boardService.updateBoard(user, boardId, updateBoardDto);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 수정 완료"), HttpStatus.OK);
+    }
+
+    // 게시글 삭제
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<ResponseDto<Void>> deleteBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        boardService.deleteBoard(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 삭제 완료"), HttpStatus.OK);
+    }
+}
