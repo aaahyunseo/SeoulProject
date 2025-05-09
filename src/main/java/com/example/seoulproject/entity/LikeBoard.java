@@ -17,7 +17,7 @@ public class LikeBoard extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "board_id")
     private Board board;
 }
