@@ -58,4 +58,32 @@ public class BoardController {
         boardService.deleteBoard(user, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 삭제 완료"), HttpStatus.OK);
     }
+
+    // 좋아요 등록
+    @PostMapping("/{boardId}/like")
+    public ResponseEntity<ResponseDto<Void>> likeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        boardService.likeBoard(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "좋아요 등록 완료"), HttpStatus.OK);
+    }
+
+    // 좋아요 취소
+    @DeleteMapping("/{boardId}/like")
+    public ResponseEntity<ResponseDto<Void>> unlikeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        boardService.unlikeBoard(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "좋아요 취소 완료"), HttpStatus.OK);
+    }
+
+    // 싫어요 등록
+    @PostMapping("/{boardId}/dislike")
+    public ResponseEntity<ResponseDto<Void>> dislikeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        boardService.dislikeBoard(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "싫어요 등록 완료"), HttpStatus.OK);
+    }
+
+    // 싫어요 취소
+    @DeleteMapping("/{boardId}/dislike")
+    public ResponseEntity<ResponseDto<Void>> undislikeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        boardService.undislikeBoard(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "싫어요 취소 완료"), HttpStatus.OK);
+    }
 }
