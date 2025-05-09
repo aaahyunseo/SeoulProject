@@ -5,6 +5,7 @@ import com.example.seoulproject.dto.request.board.CreateBoardDto;
 import com.example.seoulproject.dto.request.board.UpdateBoardDto;
 import com.example.seoulproject.dto.response.board.BoardData;
 import com.example.seoulproject.dto.response.board.BoardListData;
+import com.example.seoulproject.dto.response.board.BoardWithReactionDto;
 import com.example.seoulproject.entity.Board;
 import com.example.seoulproject.entity.DislikeBoard;
 import com.example.seoulproject.entity.LikeBoard;
@@ -15,9 +16,11 @@ import com.example.seoulproject.repository.BoardRepository;
 import com.example.seoulproject.repository.DislikeBoardRepository;
 import com.example.seoulproject.repository.LikeBoardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,6 +61,12 @@ public class BoardService {
     public void deleteBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
         Board board = findBoardByIdAndUser(user, boardId);
         boardRepository.delete(board);
+    }
+
+    // 인기글 Top3 조회
+    public List<BoardWithReactionDto> getTop3Boards() {
+        Pageable pageable = PageRequest.of(0, 3);  // 첫 페이지, 3개 항목
+        return boardRepository.findTop3ByReactionCount(pageable);
     }
 
     // 좋아요 등록
