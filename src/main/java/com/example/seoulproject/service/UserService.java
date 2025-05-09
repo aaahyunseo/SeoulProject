@@ -2,6 +2,7 @@ package com.example.seoulproject.service;
 
 import com.example.seoulproject.authentication.PasswordHashEncryption;
 import com.example.seoulproject.dto.request.user.DeleteUserDto;
+import com.example.seoulproject.dto.response.user.UserResponseDto;
 import com.example.seoulproject.entity.User;
 import com.example.seoulproject.exception.ConflictException;
 import com.example.seoulproject.exception.NotFoundException;
@@ -17,6 +18,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordHashEncryption passwordHashEncryption;
+
+    public UserResponseDto getUserInfo(User user) {
+        UserResponseDto userResponseDto = UserResponseDto.builder()
+                .name(user.getName())
+                .build();
+        return userResponseDto;
+    }
 
     public void deleteUser(User user, DeleteUserDto deleteUserDto) {
         validateIsPasswordMatches(deleteUserDto.getPassword(), user.getPassword());
