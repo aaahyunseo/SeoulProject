@@ -27,4 +27,23 @@ public class Board extends BaseEntity {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeBoard> likes;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DislikeBoard> dislikes;
+
+    public Board(User user, String title, String content){
+        this.user = user;
+        this.title = title;
+        this.content = content;
+    }
+
+    public Board setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public Board setContent(String content) {
+        this.content = content;
+        return this;
+    }
 }
