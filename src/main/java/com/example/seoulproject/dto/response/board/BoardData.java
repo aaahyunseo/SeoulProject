@@ -14,6 +14,8 @@ public class BoardData {
     private String title;
     private String content;
     private String createdAt;
+    private int likeCount;
+    private int dislikeCount;
 
     public static BoardData from(Board board) {
         return BoardData.builder()
@@ -21,6 +23,8 @@ public class BoardData {
                 .title(board.getTitle())
                 .content(board.getContent())
                 .createdAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .likeCount(board.getLikes() != null ? board.getLikes().size() : 0)
+                .dislikeCount(board.getDislikes() != null ? board.getDislikes().size() : 0)
                 .build();
     }
 }
