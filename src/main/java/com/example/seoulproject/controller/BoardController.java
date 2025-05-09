@@ -6,6 +6,7 @@ import com.example.seoulproject.dto.request.board.UpdateBoardDto;
 import com.example.seoulproject.dto.response.ResponseDto;
 import com.example.seoulproject.dto.response.board.BoardData;
 import com.example.seoulproject.dto.response.board.BoardListData;
+import com.example.seoulproject.dto.response.board.BoardWithReactionDto;
 import com.example.seoulproject.entity.User;
 import com.example.seoulproject.service.BoardService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -57,6 +59,13 @@ public class BoardController {
     public ResponseEntity<ResponseDto<Void>> deleteBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
         boardService.deleteBoard(user, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 삭제 완료"), HttpStatus.OK);
+    }
+
+    // 인기글 Top3 조회
+    @GetMapping("/top")
+    public ResponseEntity<ResponseDto<List<BoardWithReactionDto>>> getTop3Boards() {
+        List<BoardWithReactionDto> topBoards = boardService.getTop3Boards();
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "Top 3 인기 게시글 조회 완료", topBoards), HttpStatus.OK);
     }
 
     // 좋아요 등록
