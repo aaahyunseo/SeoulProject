@@ -16,11 +16,12 @@ public class AuthenticationConfig implements WebMvcConfigurer {
 
     private final AuthenticationInterceptor authenticationInterceptor;
     private final AuthenticatedUserArgumentResolver authenticatedUserArgumentResolver;
+
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor)
-                .addPathPatterns("/users/**")
-                .excludePathPatterns("/boards");
+                .addPathPatterns("/users/**", "/boards/**")
+                .excludePathPatterns("/boards/all", "/boards/top", "/boards/one/{boardId}");
     }
 
     @Override

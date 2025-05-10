@@ -23,6 +23,4 @@ public interface BoardRepository extends JpaRepository<Board, UUID> {
     ORDER BY (SIZE(b.likes) + SIZE(b.dislikes)) DESC
     """)
     List<BoardWithReactionDto> findTop3ByReactionCount(Pageable pageable);
-
-
 }

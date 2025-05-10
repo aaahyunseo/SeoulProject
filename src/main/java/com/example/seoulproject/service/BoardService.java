@@ -38,9 +38,28 @@ public class BoardService {
     }
 
     // 게시글 상세 조회
-    public BoardData getBoardById(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+    public BoardData getBoardById(@AuthenticatedUser User user, UUID boardId) {
         Board board = findBoard(boardId);
-        return BoardData.from(board);
+
+        boolean liked = false;
+        boolean disliked = false;
+
+        if (user != null) {
+            liked = likeBoardRepository.existsByUserAndBoard(user, board);
+            disliked = dislikeBoardRepository.existsByUserAndBoard(user, board);
+        }
+
+        return BoardData.from(board, liked, disliked);
+    }
+
+    // 게시글 상세 조회
+    public BoardData getBoardByIdOnLogin(@AuthenticatedUser User user, UUID boardId) {
+        Board board = findBoard(boardId);
+
+        boolean liked = likeBoardRepository.existsByUserAndBoard(user, board);
+        boolean disliked = dislikeBoardRepository.existsByUserAndBoard(user, board);
+
+        return BoardData.from(board, liked, disliked);
     }
 
     // 게시글 작성
@@ -51,7 +70,7 @@ public class BoardService {
 
     // 게시글 수정
     public void updateBoard(@AuthenticatedUser User user, UUID boardId, UpdateBoardDto updateBoardDto) {
-        Board newBoard = findBoardByIdAndUser(user, boardId);
+        Board newBoard = updateFindBoardByIdAndUser(user, boardId);
         newBoard.setTitle(updateBoardDto.getTitle())
                 .setContent(updateBoardDto.getContent());
         boardRepository.save(newBoard);
@@ -59,13 +78,13 @@ public class BoardService {
 
     // 게시글 삭제
     public void deleteBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
-        Board board = findBoardByIdAndUser(user, boardId);
+        Board board = deleteFindBoardByIdAndUser(user, boardId);
         boardRepository.delete(board);
     }
 
     // 인기글 Top3 조회
     public List<BoardWithReactionDto> getTop3Boards() {
-        Pageable pageable = PageRequest.of(0, 3);  // 첫 페이지, 3개 항목
+        Pageable pageable = PageRequest.of(0, 3);
         return boardRepository.findTop3ByReactionCount(pageable);
     }
 
@@ -127,8 +146,13 @@ public class BoardService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
     }
 
-    private Board findBoardByIdAndUser(User user, UUID boardId) {
+    private Board updateFindBoardByIdAndUser(User user, UUID boardId) {
         return boardRepository.findByIdAndUser(boardId, user)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
+    }
+
+    private Board deleteFindBoardByIdAndUser(User user, UUID boardId) {
+        return boardRepository.findByIdAndUser(boardId, user)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NO_ACCESS));
     }
 }

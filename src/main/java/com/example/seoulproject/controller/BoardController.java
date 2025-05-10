@@ -9,6 +9,7 @@ import com.example.seoulproject.dto.response.board.BoardListData;
 import com.example.seoulproject.dto.response.board.BoardWithReactionDto;
 import com.example.seoulproject.entity.User;
 import com.example.seoulproject.service.BoardService;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,16 +26,23 @@ public class BoardController {
     private final BoardService boardService;
 
     // 게시글 전체 조회
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ResponseDto<BoardListData>> getBoardList() {
         BoardListData boardListData = boardService.getBoardList();
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 전체 조회 완료", boardListData), HttpStatus.OK);
     }
 
-    // 게시글 상세 조회
-    @GetMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+    // 게시글 상세 조회 (로그인 안됐을 때)
+    @GetMapping("/one/{boardId}")
+    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@Nullable @AuthenticatedUser User user, @PathVariable UUID boardId) {
         BoardData boardDto = boardService.getBoardById(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 상세 조회 완료", boardDto), HttpStatus.OK);
+    }
+
+    // 게시글 상세 조회 (로그인 됐을 때)
+    @GetMapping("/{boardId}")
+    public ResponseEntity<ResponseDto<BoardData>> getBoardByIdOnLogin(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        BoardData boardDto = boardService.getBoardByIdOnLogin(user, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 상세 조회 완료", boardDto), HttpStatus.OK);
     }
 
