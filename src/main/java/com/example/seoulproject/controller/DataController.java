@@ -1,6 +1,7 @@
 package com.example.seoulproject.controller;
 
 import com.example.seoulproject.dto.response.data.BudgetInfoDto;
+import com.example.seoulproject.dto.response.data.BudgetTop10Dto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,6 +85,45 @@ public class DataController {
                     });
 
                     return new BudgetInfoDto(deptName, formattedValue, fieldName, colors.getLightColor(), colors.getDarkColor());
+                })
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/budget/top10")
+    public List<BudgetTop10Dto> getTop10BudgetData(@RequestParam(name = "field") String field) {
+        int pageSize = 1000;
+        int startIndex = 1;
+        int endIndex = 1000;
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/FiosTbmTecurramt/" + startIndex + "/" + endIndex)
+                .toUriString();
+
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+
+        List<Map<String, Object>> rows = (List<Map<String, Object>>)
+                ((Map<String, Object>) response.get("FiosTbmTecurramt")).get("row");
+
+        DecimalFormat formatter = new DecimalFormat("#,###");
+
+        return rows.stream()
+                .filter(row -> row.get(field) != null)
+                .sorted((a, b) -> {
+                    double aVal = Double.parseDouble(a.get(field).toString());
+                    double bVal = Double.parseDouble(b.get(field).toString());
+                    return Double.compare(bVal, aVal); // 내림차순 정렬
+                })
+                .limit(10)
+                .map(row -> {
+                    String deptName = (String) row.get("DBIZ_NM");
+                    String fieldValue;
+                    try {
+                        double number = Double.parseDouble(row.get(field).toString());
+                        fieldValue = formatter.format(number);
+                    } catch (NumberFormatException e) {
+                        fieldValue = "0";
+                    }
+                    return new BudgetTop10Dto(deptName, fieldValue);
                 })
                 .collect(Collectors.toList());
     }
