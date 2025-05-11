@@ -27,8 +27,8 @@ public class BoardController {
 
     // 게시글 전체 조회
     @GetMapping("/all")
-    public ResponseEntity<ResponseDto<BoardListData>> getBoardList(@RequestParam(defaultValue = "latest") String sort) {
-        BoardListData boardListData = boardService.getBoardList(sort);
+    public ResponseEntity<ResponseDto<BoardListData>> getBoardList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "latest") String sort) {
+        BoardListData boardListData = boardService.getBoardList(page, sort);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 전체 조회 완료", boardListData), HttpStatus.OK);
     }
 

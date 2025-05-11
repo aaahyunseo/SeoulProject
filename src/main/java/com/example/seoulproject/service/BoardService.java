@@ -32,17 +32,23 @@ public class BoardService {
     private final DislikeBoardRepository dislikeBoardRepository;
 
     // 게시글 전체 조회
-    public BoardListData getBoardList(String sort) {
+    public BoardListData getBoardList(int page, String sort) {
+        int pageSize = 10;
+        int adjustedPage = Math.max(page - 1, 0);
+
+        Pageable pageable = PageRequest.of(adjustedPage, pageSize);
         List<Board> boards;
+
         switch (sort.toLowerCase()) {
             case "popular":
-                boards = boardRepository.findAllOrderByReactionCountDesc();
+                boards = boardRepository.findAllOrderByReactionCountDesc(pageable);
                 break;
             case "latest":
             default:
-                boards = boardRepository.findAllByOrderByCreatedAtDesc();
+                boards = boardRepository.findAllByOrderByCreatedAtDesc(pageable);
                 break;
         }
+
         return BoardListData.from(boards);
     }
 
