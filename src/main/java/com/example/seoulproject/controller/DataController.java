@@ -40,15 +40,15 @@ public class DataController {
         return restTemplate.getForObject(url, Map.class);
     }
 
-    // 서울시 행정 예산 - 국비(NATN_CURR_AMT), 편성액(COMPO_AMT), 소계(SUB_SUM_CURR_AMT)
+    // 서울시 행정 예산 - 국비(NATN_CURR_AMT), 도비(SIDO_CURR_AMT), 편성액(COMPO_AMT), 소계(SUB_SUM_CURR_AMT)
     @GetMapping("/budget/simple")
     public List<BudgetInfoDto> getSimpleBudgetData(@RequestParam(defaultValue = "1") int page,
                                                    @RequestParam(name = "field") String field) {
         int pageSize = 10;
-        int currentPage = page;
         int fetchSize = 100;
-        int startIndex = (currentPage - 1) * pageSize + 1;
+        int startIndex = 1;
         List<BudgetInfoDto> result = new ArrayList<>();
+
         DecimalFormat formatter = new DecimalFormat("#,###");
         Map<String, ColorPair> colorMap = new HashMap<>();
         Random random = new Random();
@@ -56,8 +56,7 @@ public class DataController {
         while (result.size() < pageSize) {
             int endIndex = startIndex + fetchSize - 1;
 
-            String url = UriComponentsBuilder
-                    .fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/FiosTbmTecurramt/" + startIndex + "/" + endIndex)
+            String url = UriComponentsBuilder.fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/FiosTbmTecurramt/" + startIndex + "/" + endIndex)
                     .toUriString();
 
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
@@ -66,46 +65,36 @@ public class DataController {
 
             if (rows == null || rows.isEmpty()) break;
 
-            List<BudgetInfoDto> validItems = rows.stream()
-                    .filter(row -> {
-                        Object rawValue = row.get(field);
-                        if (rawValue == null) return false;
-                        try {
-                            return Double.parseDouble(rawValue.toString()) > 0;
-                        } catch (NumberFormatException e) {
-                            return false;
-                        }
-                    })
-                    .map(row -> {
-                        String deptName = (String) row.get("DBIZ_NM");
-                        Object rawValue = row.getOrDefault(field, 0);
-                        String fieldName = (String) row.get("FLD_NM");
+            for (Map<String, Object> row : rows) {
+                String deptName = (String) row.get("DBIZ_NM");
+                Object rawValue = row.getOrDefault(field, 0);
+                String fieldName = (String) row.get("FLD_NM");
 
-                        String formattedValue;
-                        try {
-                            double number = Double.parseDouble(rawValue.toString());
-                            formattedValue = formatter.format(number);
-                        } catch (NumberFormatException e) {
-                            formattedValue = "0";
-                        }
+                double value;
+                try {
+                    value = Double.parseDouble(rawValue.toString());
+                } catch (NumberFormatException e) {
+                    continue;
+                }
 
-                        ColorPair colors = colorMap.computeIfAbsent(fieldName, k -> {
-                            float hue = random.nextInt(360);
-                            float saturation = 0.5f;
-                            String light = hslToHex(hue, saturation, 0.85f);
-                            String dark = hslToHex(hue, saturation, 0.35f);
-                            return new ColorPair(light, dark);
-                        });
+                if (value <= 0) continue;
 
-                        return new BudgetInfoDto(deptName, formattedValue, fieldName, colors.getLightColor(), colors.getDarkColor());
-                    })
-                    .collect(Collectors.toList());
+                String formattedValue = formatter.format(value);
 
-            for (BudgetInfoDto item : validItems) {
+                ColorPair colors = colorMap.computeIfAbsent(fieldName, k -> {
+                    float hue = random.nextInt(360);
+                    float saturation = 0.5f;
+                    String light = hslToHex(hue, saturation, 0.85f);
+                    String dark = hslToHex(hue, saturation, 0.35f);
+                    return new ColorPair(light, dark);
+                });
+
+                result.add(new BudgetInfoDto(deptName, formattedValue, fieldName, colors.getLightColor(), colors.getDarkColor()));
+
                 if (result.size() >= pageSize) break;
-                result.add(item);
             }
-            startIndex = endIndex + 1;
+
+            startIndex += fetchSize;
         }
 
         return result;
