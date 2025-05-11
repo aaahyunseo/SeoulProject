@@ -16,7 +16,7 @@ public interface BoardRepository extends JpaRepository<Board, UUID> {
 
     @Query("""
     SELECT new com.example.seoulproject.dto.response.board.BoardWithReactionDto(
-        b.id, b.title, b.content,
+        b.id, b.title, b.content, b.createdAt,
         SIZE(b.likes), SIZE(b.dislikes)
     )
     FROM Board b
