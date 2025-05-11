@@ -13,10 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.seoulproject.controller.ColorPair.hslToHex;
@@ -48,46 +45,70 @@ public class DataController {
     public List<BudgetInfoDto> getSimpleBudgetData(@RequestParam(defaultValue = "1") int page,
                                                    @RequestParam(name = "field") String field) {
         int pageSize = 10;
-        int startIndex = (page - 1) * pageSize + 1;
-        int endIndex = page * pageSize;
-
-        String url = UriComponentsBuilder.fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/FiosTbmTecurramt/" + startIndex + "/" + endIndex)
-                .toUriString();
-
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-        List<Map<String, Object>> rows = (List<Map<String, Object>>)
-                ((Map<String, Object>) response.get("FiosTbmTecurramt")).get("row");
-
+        int currentPage = page;
+        int fetchSize = 100;
+        int startIndex = (currentPage - 1) * pageSize + 1;
+        List<BudgetInfoDto> result = new ArrayList<>();
         DecimalFormat formatter = new DecimalFormat("#,###");
         Map<String, ColorPair> colorMap = new HashMap<>();
         Random random = new Random();
 
-        return rows.stream()
-                .map(row -> {
-                    String deptName = (String) row.get("DBIZ_NM");
-                    Object rawValue = row.getOrDefault(field, 0);
-                    String fieldName = (String) row.get("FLD_NM");
+        while (result.size() < pageSize) {
+            int endIndex = startIndex + fetchSize - 1;
 
-                    String formattedValue;
-                    try {
-                        double number = Double.parseDouble(rawValue.toString());
-                        formattedValue = formatter.format(number);
-                    } catch (NumberFormatException e) {
-                        formattedValue = "0";
-                    }
+            String url = UriComponentsBuilder
+                    .fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/FiosTbmTecurramt/" + startIndex + "/" + endIndex)
+                    .toUriString();
 
-                    // 색상쌍 생성 (분야별 고정)
-                    ColorPair colors = colorMap.computeIfAbsent(fieldName, k -> {
-                        float hue = random.nextInt(360);
-                        float saturation = 0.5f;
-                        String light = hslToHex(hue, saturation, 0.85f); // 밝은 색
-                        String dark = hslToHex(hue, saturation, 0.35f);  // 진한 색
-                        return new ColorPair(light, dark);
-                    });
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            List<Map<String, Object>> rows = (List<Map<String, Object>>)
+                    ((Map<String, Object>) response.get("FiosTbmTecurramt")).get("row");
 
-                    return new BudgetInfoDto(deptName, formattedValue, fieldName, colors.getLightColor(), colors.getDarkColor());
-                })
-                .collect(Collectors.toList());
+            if (rows == null || rows.isEmpty()) break;
+
+            List<BudgetInfoDto> validItems = rows.stream()
+                    .filter(row -> {
+                        Object rawValue = row.get(field);
+                        if (rawValue == null) return false;
+                        try {
+                            return Double.parseDouble(rawValue.toString()) > 0;
+                        } catch (NumberFormatException e) {
+                            return false;
+                        }
+                    })
+                    .map(row -> {
+                        String deptName = (String) row.get("DBIZ_NM");
+                        Object rawValue = row.getOrDefault(field, 0);
+                        String fieldName = (String) row.get("FLD_NM");
+
+                        String formattedValue;
+                        try {
+                            double number = Double.parseDouble(rawValue.toString());
+                            formattedValue = formatter.format(number);
+                        } catch (NumberFormatException e) {
+                            formattedValue = "0";
+                        }
+
+                        ColorPair colors = colorMap.computeIfAbsent(fieldName, k -> {
+                            float hue = random.nextInt(360);
+                            float saturation = 0.5f;
+                            String light = hslToHex(hue, saturation, 0.85f);
+                            String dark = hslToHex(hue, saturation, 0.35f);
+                            return new ColorPair(light, dark);
+                        });
+
+                        return new BudgetInfoDto(deptName, formattedValue, fieldName, colors.getLightColor(), colors.getDarkColor());
+                    })
+                    .collect(Collectors.toList());
+
+            for (BudgetInfoDto item : validItems) {
+                if (result.size() >= pageSize) break;
+                result.add(item);
+            }
+            startIndex = endIndex + 1;
+        }
+
+        return result;
     }
 
     // 서울시 행정 예산 top10
