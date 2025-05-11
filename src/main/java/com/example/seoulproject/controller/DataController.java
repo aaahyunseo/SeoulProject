@@ -181,4 +181,44 @@ public class DataController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/budget-by-field/top5")
+    public List<BudgetTop10Dto> getTop5SubSumByField() {
+        int startIndex = 1;
+        int endIndex = 1000;
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/FiosTbmTecurramt/" + startIndex + "/" + endIndex)
+                .toUriString();
+
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        if (response == null || !response.containsKey("FiosTbmTecurramt")) return Collections.emptyList();
+
+        List<Map<String, Object>> rows = (List<Map<String, Object>>)
+                ((Map<String, Object>) response.get("FiosTbmTecurramt")).get("row");
+
+        if (rows == null || rows.isEmpty()) return Collections.emptyList();
+
+        Map<String, Double> sumByField = new HashMap<>();
+        for (Map<String, Object> row : rows) {
+            String fieldName = (String) row.get("FLD_NM");
+            Object rawValue = row.get("SUB_SUM_CURR_AMT");
+
+            if (fieldName == null || rawValue == null) continue;
+
+            try {
+                double value = Double.parseDouble(rawValue.toString());
+                sumByField.put(fieldName, sumByField.getOrDefault(fieldName, 0.0) + value);
+            } catch (NumberFormatException e) {
+                // 예산 값이 숫자가 아닐 경우 무시
+            }
+        }
+
+        DecimalFormat formatter = new DecimalFormat("#,###");
+
+        return sumByField.entrySet().stream()
+                .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
+                .limit(5)
+                .map(entry -> new BudgetTop10Dto(entry.getKey(), formatter.format(entry.getValue())))
+                .collect(Collectors.toList());
+    }
 }
