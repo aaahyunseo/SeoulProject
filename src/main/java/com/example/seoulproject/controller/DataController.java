@@ -49,18 +49,16 @@ public class DataController {
         int fetchSize = 100;
         int startIndex = (currentPage - 1) * pageSize + 1;
         List<BudgetInfoDto> result = new ArrayList<>();
-        Set<String> seenDeptNames = new HashSet<>();
         DecimalFormat formatter = new DecimalFormat("#,###");
 
         while (result.size() < pageSize) {
             int endIndex = startIndex + fetchSize - 1;
 
-            String url = UriComponentsBuilder.fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/FiosTbmTecurramt/" + startIndex + "/" + endIndex)
+            String url = UriComponentsBuilder
+                    .fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/FiosTbmTecurramt/" + startIndex + "/" + endIndex)
                     .toUriString();
 
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-            if (response == null || !response.containsKey("FiosTbmTecurramt")) break;
-
             List<Map<String, Object>> rows = (List<Map<String, Object>>)
                     ((Map<String, Object>) response.get("FiosTbmTecurramt")).get("row");
 
@@ -96,16 +94,14 @@ public class DataController {
 
             for (BudgetInfoDto item : validItems) {
                 if (result.size() >= pageSize) break;
-                if (seenDeptNames.contains(item.getDeptName())) continue;
-                seenDeptNames.add(item.getDeptName());
                 result.add(item);
             }
 
             startIndex = endIndex + 1;
-            if (startIndex > 3000) break;
         }
         return result;
     }
+
 
 
     // 서울시 행정 예산 top10
