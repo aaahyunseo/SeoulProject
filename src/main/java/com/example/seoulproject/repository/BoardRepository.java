@@ -13,6 +13,7 @@ import java.util.UUID;
 
 public interface BoardRepository extends JpaRepository<Board, UUID> {
     Optional<Board> findByIdAndUser(UUID boardId, User user);
+    List<Board> findAllByOrderByCreatedAtDesc();
 
     @Query("""
     SELECT new com.example.seoulproject.dto.response.board.BoardWithReactionDto(
@@ -23,4 +24,13 @@ public interface BoardRepository extends JpaRepository<Board, UUID> {
     ORDER BY (SIZE(b.likes) + SIZE(b.dislikes)) DESC
     """)
     List<BoardWithReactionDto> findTop3ByReactionCount(Pageable pageable);
+
+    @Query("""
+    SELECT b FROM Board b
+    LEFT JOIN b.likes l
+    LEFT JOIN b.dislikes d
+    GROUP BY b
+    ORDER BY (COUNT(l) + COUNT(d)) DESC
+""")
+    List<Board> findAllOrderByReactionCountDesc();
 }
