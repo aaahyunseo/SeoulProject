@@ -13,6 +13,7 @@ public class BoardData {
     private UUID boardId;
     private String title;
     private String content;
+    private String writer;
     private String createdAt;
     private int likeCount;
     private int dislikeCount;
@@ -24,6 +25,7 @@ public class BoardData {
                 .boardId(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
+                .writer(board.getUser().getName())
                 .createdAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                 .likeCount(board.getLikes() != null ? board.getLikes().size() : 0)
                 .dislikeCount(board.getDislikes() != null ? board.getDislikes().size() : 0)
