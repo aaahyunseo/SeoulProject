@@ -45,10 +45,11 @@ public class DataController {
     public List<BudgetInfoDto> getSimpleBudgetData(@RequestParam(defaultValue = "1") int page,
                                                    @RequestParam(name = "field") String field) {
         int pageSize = 10;
+        int currentPage = page;
         int fetchSize = 100;
-        int startIndex = 1;
+        int startIndex = (currentPage - 1) * pageSize + 1;
         List<BudgetInfoDto> result = new ArrayList<>();
-
+        Set<String> seenDeptNames = new HashSet<>();
         DecimalFormat formatter = new DecimalFormat("#,###");
 
         while (result.size() < pageSize) {
@@ -58,35 +59,50 @@ public class DataController {
                     .toUriString();
 
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            if (response == null || !response.containsKey("FiosTbmTecurramt")) break;
+
             List<Map<String, Object>> rows = (List<Map<String, Object>>)
                     ((Map<String, Object>) response.get("FiosTbmTecurramt")).get("row");
 
             if (rows == null || rows.isEmpty()) break;
 
-            for (Map<String, Object> row : rows) {
-                String deptName = (String) row.get("DBIZ_NM");
-                Object rawValue = row.getOrDefault(field, 0);
-                String fieldName = (String) row.get("FLD_NM");
+            List<BudgetInfoDto> validItems = rows.stream()
+                    .filter(row -> {
+                        Object rawValue = row.get(field);
+                        if (rawValue == null) return false;
+                        try {
+                            return Double.parseDouble(rawValue.toString()) > 0;
+                        } catch (NumberFormatException e) {
+                            return false;
+                        }
+                    })
+                    .map(row -> {
+                        String deptName = (String) row.get("DBIZ_NM");
+                        Object rawValue = row.getOrDefault(field, 0);
+                        String fieldName = (String) row.get("FLD_NM");
 
-                double value;
-                try {
-                    value = Double.parseDouble(rawValue.toString());
-                } catch (NumberFormatException e) {
-                    continue;
-                }
+                        String formattedValue;
+                        try {
+                            double number = Double.parseDouble(rawValue.toString());
+                            formattedValue = formatter.format(number);
+                        } catch (NumberFormatException e) {
+                            formattedValue = "0";
+                        }
 
-                if (value <= 0) continue;
+                        ColorPair colors = ColorPair.getColorPairForField(fieldName);
+                        return new BudgetInfoDto(deptName, formattedValue, fieldName, colors.getLightColor(), colors.getDarkColor());
+                    })
+                    .collect(Collectors.toList());
 
-                String formattedValue = formatter.format(value);
-
-                ColorPair colors = ColorPair.getColorPairForField(fieldName);
-
-                result.add(new BudgetInfoDto(deptName, formattedValue, fieldName, colors.getLightColor(), colors.getDarkColor()));
-
+            for (BudgetInfoDto item : validItems) {
                 if (result.size() >= pageSize) break;
+                if (seenDeptNames.contains(item.getDeptName())) continue;
+                seenDeptNames.add(item.getDeptName());
+                result.add(item);
             }
 
-            startIndex += fetchSize;
+            startIndex = endIndex + 1;
+            if (startIndex > 3000) break;
         }
         return result;
     }
