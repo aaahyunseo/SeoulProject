@@ -19,12 +19,10 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.example.seoulproject.controller.ColorPair.hslToHex;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class DataController {
+public class BudgetController {
 
     @Value("${seoul.api.key}")
     private String apiKey;
