@@ -20,6 +20,7 @@ public enum ErrorCode {
     COOKIE_NOT_FOUND("4040", "쿠키를 찾을 수 없습니다."),
     USER_NOT_FOUND("4041", "유저를 찾을 수 없습니다."),
     BOARD_NOT_FOUND("4042", "게시글을 찾을 수 없습니다."),
+    COMMENT_NOT_FOUND("4043", "댓글을 찾을 수 없습니다."),
 
     // ConflictException
     DUPLICATED_NAME("4090", "이미 사용중인 이름입니다."),

@@ -31,6 +31,9 @@ public class Board extends BaseEntity {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DislikeBoard> dislikes;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
     public Board(User user, String title, String content){
         this.user = user;
         this.title = title;
