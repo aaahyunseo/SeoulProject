@@ -2,6 +2,7 @@ package com.example.seoulproject.controller;
 
 import com.example.seoulproject.dto.response.data.BudgetInfoDto;
 import com.example.seoulproject.dto.response.data.BudgetTop10Dto;
+import com.example.seoulproject.dto.response.data.CitizenBudgetDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +43,7 @@ public class DataController {
         return restTemplate.getForObject(url, Map.class);
     }
 
-    // 국비(NATN_CURR_AMT), 편성액(COMPO_AMT), 소계(SUB_SUM_CURR_AMT)
+    // 서울시 행정 예산 - 국비(NATN_CURR_AMT), 편성액(COMPO_AMT), 소계(SUB_SUM_CURR_AMT)
     @GetMapping("/budget/simple")
     public List<BudgetInfoDto> getSimpleBudgetData(@RequestParam(defaultValue = "1") int page,
                                                    @RequestParam(name = "field") String field) {
@@ -89,6 +90,7 @@ public class DataController {
                 .collect(Collectors.toList());
     }
 
+    // 서울시 행정 예산 top10
     @GetMapping("/budget/top10")
     public List<BudgetTop10Dto> getTop10BudgetData(@RequestParam(name = "field") String field) {
         int pageSize = 1000;
@@ -124,6 +126,43 @@ public class DataController {
                         fieldValue = "0";
                     }
                     return new BudgetTop10Dto(deptName, fieldValue);
+                })
+                .collect(Collectors.toList());
+    }
+
+    // 시민 참여 예산
+    @GetMapping("/budget/citizen")
+    public List<CitizenBudgetDto> getCitizenBudgetData(@RequestParam(defaultValue = "1") int page) {
+        int pageSize = 10;
+        int startIndex = (page - 1) * pageSize + 1;
+        int endIndex = page * pageSize;
+
+        String url = UriComponentsBuilder.fromHttpUrl("http://openapi.seoul.go.kr:8088/" + apiKey + "/json/bizSuggExecutionInfo/" + startIndex + "/" + endIndex)
+                .toUriString();
+
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+
+        List<Map<String, Object>> rows = (List<Map<String, Object>>)
+                ((Map<String, Object>) response.get("bizSuggExecutionInfo")).get("row");
+
+        DecimalFormat formatter = new DecimalFormat("#,###");
+
+        return rows.stream()
+                .map(row -> {
+                    String bizName = (String) row.getOrDefault("BIZ_NM", "-");
+                    String year = String.valueOf(row.getOrDefault("FIS_YEAR", "-"));
+                    String location = (String) row.getOrDefault("BUD_LOC", "-");
+
+                    Object rawBudget = row.get("BUD_COST");
+                    String budgetCost;
+                    try {
+                        double number = Double.parseDouble(rawBudget.toString());
+                        budgetCost = formatter.format(number);
+                    } catch (Exception e) {
+                        budgetCost = "0";
+                    }
+
+                    return new CitizenBudgetDto(bizName, budgetCost, year, location);
                 })
                 .collect(Collectors.toList());
     }
