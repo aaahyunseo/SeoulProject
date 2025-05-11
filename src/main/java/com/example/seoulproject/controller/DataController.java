@@ -50,8 +50,6 @@ public class DataController {
         List<BudgetInfoDto> result = new ArrayList<>();
 
         DecimalFormat formatter = new DecimalFormat("#,###");
-        Map<String, ColorPair> colorMap = new HashMap<>();
-        Random random = new Random();
 
         while (result.size() < pageSize) {
             int endIndex = startIndex + fetchSize - 1;
@@ -81,13 +79,7 @@ public class DataController {
 
                 String formattedValue = formatter.format(value);
 
-                ColorPair colors = colorMap.computeIfAbsent(fieldName, k -> {
-                    float hue = random.nextInt(360);
-                    float saturation = 0.5f;
-                    String light = hslToHex(hue, saturation, 0.85f);
-                    String dark = hslToHex(hue, saturation, 0.35f);
-                    return new ColorPair(light, dark);
-                });
+                ColorPair colors = ColorPair.getColorPairForField(fieldName);
 
                 result.add(new BudgetInfoDto(deptName, formattedValue, fieldName, colors.getLightColor(), colors.getDarkColor()));
 
@@ -96,9 +88,9 @@ public class DataController {
 
             startIndex += fetchSize;
         }
-
         return result;
     }
+
 
     // 서울시 행정 예산 top10
     @GetMapping("/budget/top10")

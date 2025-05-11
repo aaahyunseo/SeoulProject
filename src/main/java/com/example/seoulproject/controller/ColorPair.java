@@ -37,5 +37,16 @@ public class ColorPair {
 
         return String.format("#%02X%02X%02X", r255, g255, b255);
     }
+
+    public static ColorPair getColorPairForField(String fieldName) {
+        int hue = fieldName.hashCode() % 360;
+        float saturation = 0.5f;
+        float lightness = 0.85f;
+
+        String lightColor = hslToHex(hue, saturation, lightness);
+        String darkColor = hslToHex(hue, saturation, 0.35f);
+
+        return new ColorPair(lightColor, darkColor);
+    }
 }
 
