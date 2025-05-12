@@ -33,18 +33,23 @@ public class BoardController {
     }
 
     // 게시글 상세 조회 (로그인 안됐을 때)
-    @GetMapping("/one/{boardId}")
+    @GetMapping("/{boardId}")
     public ResponseEntity<ResponseDto<BoardData>> getBoardById(@Nullable @AuthenticatedUser User user, @PathVariable UUID boardId) {
-        BoardData boardDto = boardService.getBoardById(user, boardId);
+        BoardData boardDto;
+        if (user == null) {
+            boardDto = boardService.getBoardById(boardId);
+        } else {
+            boardDto = boardService.getBoardByIdOnLogin(user, boardId);
+        }
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 상세 조회 완료", boardDto), HttpStatus.OK);
     }
 
-    // 게시글 상세 조회 (로그인 됐을 때)
-    @GetMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<BoardData>> getBoardByIdOnLogin(@AuthenticatedUser User user, @PathVariable UUID boardId) {
-        BoardData boardDto = boardService.getBoardByIdOnLogin(user, boardId);
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 상세 조회 완료", boardDto), HttpStatus.OK);
-    }
+//    // 게시글 상세 조회 (로그인 됐을 때)
+//    @GetMapping("/{boardId}")
+//    public ResponseEntity<ResponseDto<BoardData>> getBoardByIdOnLogin(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+//        BoardData boardDto = boardService.getBoardByIdOnLogin(user, boardId);
+//        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 상세 조회 완료", boardDto), HttpStatus.OK);
+//    }
 
     // 게시글 작성
     @PostMapping

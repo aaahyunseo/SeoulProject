@@ -53,16 +53,11 @@ public class BoardService {
     }
 
     // 게시글 상세 조회
-    public BoardData getBoardById(@AuthenticatedUser User user, UUID boardId) {
+    public BoardData getBoardById(UUID boardId) {
         Board board = findBoard(boardId);
 
         boolean liked = false;
         boolean disliked = false;
-
-        if (user != null) {
-            liked = likeBoardRepository.existsByUserAndBoard(user, board);
-            disliked = dislikeBoardRepository.existsByUserAndBoard(user, board);
-        }
 
         return BoardData.from(board, liked, disliked);
     }

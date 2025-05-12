@@ -1,8 +1,6 @@
 package com.example.seoulproject.authentication;
 
 
-import com.example.seoulproject.exception.UnauthorizedException;
-import com.example.seoulproject.exception.errorcode.ErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -18,6 +16,6 @@ public class AuthenticationExtractor {
                 }
             }
         }
-        throw new UnauthorizedException(ErrorCode.COOKIE_NOT_FOUND);
+        return null;
     }
 }
