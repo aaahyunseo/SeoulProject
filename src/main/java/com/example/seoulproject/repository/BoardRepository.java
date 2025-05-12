@@ -7,22 +7,25 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface BoardRepository extends JpaRepository<Board, UUID> {
     Optional<Board> findByIdAndUser(UUID boardId, User user);
-    List<Board> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    @Query("""
-    SELECT b FROM Board b
-    LEFT JOIN b.likes l
-    LEFT JOIN b.dislikes d
-    GROUP BY b
-    ORDER BY (COUNT(l) + COUNT(d)) DESC
-""")
-    List<Board> findAllOrderByReactionCountDesc(Pageable pageable);
+    @Query(value = """
+    SELECT b.* FROM boards b
+    LEFT JOIN `like-boards` l ON b.id = l.board_id
+    LEFT JOIN `dislike-boards` d ON b.id = d.board_id
+    GROUP BY b.id
+    ORDER BY (COUNT(DISTINCT l.id) + COUNT(DISTINCT d.id)) DESC
+    LIMIT :limit OFFSET :offset
+    """, nativeQuery = true)
+    List<Board> findAllOrderByReactionCountDescNative(@Param("limit") int limit, @Param("offset") int offset);
+
 
     @Query("""
     SELECT new com.example.seoulproject.dto.response.board.BoardWithReactionDto(

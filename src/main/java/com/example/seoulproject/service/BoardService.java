@@ -17,6 +17,7 @@ import com.example.seoulproject.repository.DislikeBoardRepository;
 import com.example.seoulproject.repository.LikeBoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -36,17 +37,13 @@ public class BoardService {
         int pageSize = 10;
         int adjustedPage = Math.max(page - 1, 0);
 
-        Pageable pageable = PageRequest.of(adjustedPage, pageSize);
         List<Board> boards;
 
-        switch (sort.toLowerCase()) {
-            case "popular":
-                boards = boardRepository.findAllOrderByReactionCountDesc(pageable);
-                break;
-            case "latest":
-            default:
-                boards = boardRepository.findAllByOrderByCreatedAtDesc(pageable);
-                break;
+        if (sort.equalsIgnoreCase("popular")) {
+            boards = boardRepository.findAllOrderByReactionCountDescNative(pageSize, adjustedPage * pageSize);
+        } else {
+            Pageable pageable = PageRequest.of(adjustedPage, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+            boards = boardRepository.findAll(pageable).getContent();
         }
 
         return BoardListData.from(boards);
