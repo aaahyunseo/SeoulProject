@@ -44,13 +44,6 @@ public class BoardController {
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 상세 조회 완료", boardDto), HttpStatus.OK);
     }
 
-//    // 게시글 상세 조회 (로그인 됐을 때)
-//    @GetMapping("/{boardId}")
-//    public ResponseEntity<ResponseDto<BoardData>> getBoardByIdOnLogin(@AuthenticatedUser User user, @PathVariable UUID boardId) {
-//        BoardData boardDto = boardService.getBoardByIdOnLogin(user, boardId);
-//        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 상세 조회 완료", boardDto), HttpStatus.OK);
-//    }
-
     // 게시글 작성
     @PostMapping
     public ResponseEntity<ResponseDto<Void>> createBoard(@AuthenticatedUser User user, @Valid @RequestBody CreateBoardDto createBoardDto) {

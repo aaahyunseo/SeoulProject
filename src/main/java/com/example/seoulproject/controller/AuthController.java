@@ -47,6 +47,9 @@ public class AuthController {
         ResponseCookie accessCookie = ResponseCookie.from("AccessToken", null)
                 .maxAge(0)
                 .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .build();
         response.addHeader("Set-Cookie", accessCookie.toString());
     }
