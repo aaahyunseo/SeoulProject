@@ -19,7 +19,7 @@ import java.util.UUID;
 public class CommentController {
     private final CommentService commentService;
 
-    @GetMapping("/{boardId}")
+    @GetMapping("/get/{boardId}")
     public ResponseEntity<ResponseDto<CommentListData>> getComments(@PathVariable UUID boardId) {
         CommentListData commandListData = commentService.getComments(boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "댓글 전체 조회 완료", commandListData), HttpStatus.OK);
