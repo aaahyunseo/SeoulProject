@@ -72,3 +72,31 @@
 | **범위** | 전체 사업 | 시민 제안 사업 |
 | **목적** | 예산 집행 전체 흐름 | 시민참여 정책 사례 추적 |
 | **활용 포인트** | 예산 시각화, 분야 비교 | 참여 유도, 성공 사례 보여주기 |
+
+
+<br/>
+<br/>
+
+
+<div align=center>
+<h2>결과물</h2>
+  <h3>🏡 홈</h3>
+    <img width="1470" alt="스크린샷 2025-05-14 오전 12 30 06" src="https://github.com/user-attachments/assets/d69d8ebd-ee8a-4093-9fde-8a23836f3d2d" />
+    <img width="1470" alt="스크린샷 2025-05-14 오전 12 30 19" src="https://github.com/user-attachments/assets/f9f6ca75-2148-4338-9b33-b4fd77e804d7" />
+    <img width="1470" alt="스크린샷 2025-05-14 오전 12 30 31" src="https://github.com/user-attachments/assets/462970d7-fcf7-4378-a85a-8470ab59f074" />
+  <h3>👤 회원가입/로그인</h3>
+    <img width="1470" alt="스크린샷 2025-05-14 오전 12 30 43" src="https://github.com/user-attachments/assets/f2b15123-ccae-4506-ab50-7d8a498db301" />
+    <img width="1470" alt="스크린샷 2025-05-14 오전 12 30 54" src="https://github.com/user-attachments/assets/b29ae4e5-455d-45ea-ac53-8c92ac080283" />
+  <h3>💵 서울시 행정 예산</h3>
+<img width="1470" alt="스크린샷 2025-05-14 오전 12 31 08" src="https://github.com/user-attachments/assets/e9c3372e-42d2-4b9e-bc4c-ebc299371d22" />
+<img width="1470" alt="스크린샷 2025-05-14 오전 12 31 32" src="https://github.com/user-attachments/assets/68bf444c-9000-4214-a310-ce2e6ea58636" />
+  <h3>💵 시민 참여 예산</h3>
+<img width="1470" alt="스크린샷 2025-05-14 오전 12 31 42" src="https://github.com/user-attachments/assets/d015854d-d8b8-4e34-a314-d2c37ca83a22" />
+  <h3>🗣️ 커뮤니티</h3>
+<img width="1470" alt="스크린샷 2025-05-14 오전 12 31 54" src="https://github.com/user-attachments/assets/889d4f6b-98fc-423e-9727-365c032dc943" />
+<img width="1470" alt="스크린샷 2025-05-14 오전 12 32 39" src="https://github.com/user-attachments/assets/dee493ce-c80c-4c9e-b0bc-4d1cf8ee1840" />
+<img width="1470" alt="스크린샷 2025-05-14 오전 12 32 24" src="https://github.com/user-attachments/assets/3dfc5dd3-ce4d-48b4-918e-b50524f91c08" />
+<div/>
+
+<br/>
+<br/>
