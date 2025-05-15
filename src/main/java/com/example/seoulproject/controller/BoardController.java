@@ -12,6 +12,7 @@ import com.example.seoulproject.service.BoardService;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class BoardController {
 
     // 게시글 상세 조회 (로그인 안됐을 때)
     @GetMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@Nullable @AuthenticatedUser User user, @PathVariable UUID boardId) {
+    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@Parameter(hidden = true) @Nullable @AuthenticatedUser User user, @PathVariable UUID boardId) {
         BoardData boardDto;
         if (user == null) {
             boardDto = boardService.getBoardById(boardId);
@@ -46,14 +47,14 @@ public class BoardController {
 
     // 게시글 작성
     @PostMapping
-    public ResponseEntity<ResponseDto<Void>> createBoard(@AuthenticatedUser User user, @Valid @RequestBody CreateBoardDto createBoardDto) {
+    public ResponseEntity<ResponseDto<Void>> createBoard(@Parameter(hidden = true) @AuthenticatedUser User user, @Valid @RequestBody CreateBoardDto createBoardDto) {
         boardService.createBoard(user, createBoardDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "게시글 작성 완료"), HttpStatus.CREATED);
     }
 
     // 게시글 수정
     @PatchMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<Void>> updateBoard(@AuthenticatedUser User user,
+    public ResponseEntity<ResponseDto<Void>> updateBoard(@Parameter(hidden = true) @AuthenticatedUser User user,
                                                          @PathVariable UUID boardId,
                                                          @Valid @RequestBody UpdateBoardDto updateBoardDto) {
         boardService.updateBoard(user, boardId, updateBoardDto);
@@ -62,7 +63,7 @@ public class BoardController {
 
     // 게시글 삭제
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<Void>> deleteBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+    public ResponseEntity<ResponseDto<Void>> deleteBoard(@Parameter(hidden = true) @AuthenticatedUser User user, @PathVariable UUID boardId) {
         boardService.deleteBoard(user, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 삭제 완료"), HttpStatus.OK);
     }
@@ -76,28 +77,28 @@ public class BoardController {
 
     // 좋아요 등록
     @PostMapping("/{boardId}/like")
-    public ResponseEntity<ResponseDto<Void>> likeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+    public ResponseEntity<ResponseDto<Void>> likeBoard(@Parameter(hidden = true) @AuthenticatedUser User user, @PathVariable UUID boardId) {
         boardService.likeBoard(user, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "좋아요 등록 완료"), HttpStatus.OK);
     }
 
     // 좋아요 취소
     @DeleteMapping("/{boardId}/like")
-    public ResponseEntity<ResponseDto<Void>> unlikeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+    public ResponseEntity<ResponseDto<Void>> unlikeBoard(@Parameter(hidden = true) @AuthenticatedUser User user, @PathVariable UUID boardId) {
         boardService.unlikeBoard(user, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "좋아요 취소 완료"), HttpStatus.OK);
     }
 
     // 싫어요 등록
     @PostMapping("/{boardId}/dislike")
-    public ResponseEntity<ResponseDto<Void>> dislikeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+    public ResponseEntity<ResponseDto<Void>> dislikeBoard(@Parameter(hidden = true) @AuthenticatedUser User user, @PathVariable UUID boardId) {
         boardService.dislikeBoard(user, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "싫어요 등록 완료"), HttpStatus.OK);
     }
 
     // 싫어요 취소
     @DeleteMapping("/{boardId}/dislike")
-    public ResponseEntity<ResponseDto<Void>> undislikeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+    public ResponseEntity<ResponseDto<Void>> undislikeBoard(@Parameter(hidden = true) @AuthenticatedUser User user, @PathVariable UUID boardId) {
         boardService.undislikeBoard(user, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "싫어요 취소 완료"), HttpStatus.OK);
     }

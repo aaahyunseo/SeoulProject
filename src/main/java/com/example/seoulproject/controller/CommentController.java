@@ -6,6 +6,7 @@ import com.example.seoulproject.dto.response.ResponseDto;
 import com.example.seoulproject.dto.response.comment.CommentListData;
 import com.example.seoulproject.entity.User;
 import com.example.seoulproject.service.CommentService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +27,13 @@ public class CommentController {
     }
 
     @PostMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<Void>> createComment(@AuthenticatedUser User user, @PathVariable UUID boardId, @RequestBody CommentRequestDto dto) {
+    public ResponseEntity<ResponseDto<Void>> createComment(@Parameter(hidden = true) @AuthenticatedUser User user, @PathVariable UUID boardId, @RequestBody CommentRequestDto dto) {
         commentService.createComment(user, boardId, dto);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.CREATED, "댓글 작성 완료", null));
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ResponseDto<Void>> deleteComment(@AuthenticatedUser User user, @PathVariable UUID commentId) {
+    public ResponseEntity<ResponseDto<Void>> deleteComment(@Parameter(hidden = true) @AuthenticatedUser User user, @PathVariable UUID commentId) {
         commentService.deleteComment(user, commentId);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "댓글 삭제 완료", null));
     }
